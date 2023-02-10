@@ -7,9 +7,6 @@ import { Booking } from "@prisma/client";
 import dayjs from "dayjs";
 
 async function checkTicket(userId: number) {
-  //buscar enrollment
-  //buscar ticket com o enrollment
-  //checar se o ticker é presencial, tem hospedagem e está pago
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) {
     throw notFoundError();
@@ -28,16 +25,24 @@ async function getUserBookings(userId: number): Promise<Booking> {
   return bookings;
 }
 
-async function checkRoom(userId: number, roomId: number): Promise<void> {
+async function checkRoom( roomId: number): Promise<void> {
   const roomBookings = await bookingRepository.getBookingsByRoomId(roomId);
   const room = await hotelRepository.findRoomByRoomId(roomId);
-  if( !room) throw notFoundError();
+  if(!room) throw notFoundError();
   if(room.capacity <= roomBookings.length) throw noVacancyError();
 }
 
 async function postUserBooking(userId: number, roomId: number): Promise<number> {
-  checkRoom(userId, roomId);
+  await checkRoom(roomId);
   const data = { userId, roomId, updatedAt: dayjs().toDate() };
+  const postedBooking = await bookingRepository.postOrUpdateUserBooking(data);
+  return postedBooking.id;
+}
+
+async function updateUserBooking(userId: number, roomId: number, bookingId: number) {
+  await getUserBookings(userId);
+  await checkRoom(roomId);
+  const data = { id: bookingId, userId, roomId, updatedAt: dayjs().toDate() };
   const postedBooking = await bookingRepository.postOrUpdateUserBooking(data);
   return postedBooking.id;
 }
@@ -45,7 +50,8 @@ async function postUserBooking(userId: number, roomId: number): Promise<number> 
 const bookingService = {
   checkTicket,
   getUserBookings,
-  postUserBooking
+  postUserBooking,
+  updateUserBooking
 };
 
 export default bookingService;
