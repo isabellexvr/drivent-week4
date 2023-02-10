@@ -6,6 +6,10 @@ async function getUserBooking(userId: number) {
   });
 }
 
+async function postOrUpdateUserBooking(userId: number) {
+  return
+}
+
 const bookingRepository = {
   getUserBooking
 };

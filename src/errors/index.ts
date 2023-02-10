@@ -6,3 +6,4 @@ export * from "./not-found-error";
 export * from "./unauthorized-error";
 export * from "./request-error";
 export * from "./out-of-business-rules-error";
+export * from "./no-vacancy-error";

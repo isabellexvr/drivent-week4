@@ -26,6 +26,10 @@ async function getUserBookings(userId: number): Promise<Booking> {
   return bookings;
 }
 
+async function postOrUpdateUserBooking(userId: number) {
+
+}
+
 const bookingService = {
   checkTicket,
   getUserBookings
