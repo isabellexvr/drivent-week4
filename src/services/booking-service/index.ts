@@ -1,6 +1,8 @@
 import enrollmentRepository from "@/repositories/enrollment-repository";
 import ticketRepository from "@/repositories/ticket-repository";
 import { notFoundError, outOtBusinessRulesError } from "@/errors";
+import bookingRepository from "@/repositories/booking-repository";
+import { Booking } from "@prisma/client";
 
 async function checkTicket(userId: number) {
   //buscar enrollment
@@ -16,7 +18,7 @@ async function checkTicket(userId: number) {
   }
 }
 
-async function getUserBookings(userId: number) {
+async function getUserBookings(userId: number): Promise<Booking> {
   const bookings = await bookingRepository.getUserBooking(userId);
   if(!bookings) {
     throw notFoundError();
