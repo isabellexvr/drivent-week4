@@ -35,11 +35,11 @@ async function checkRoom(userId: number, roomId: number): Promise<void> {
   if(room.capacity <= roomBookings.length) throw noVacancyError();
 }
 
-async function postUserBooking(userId: number, roomId: number): Promise<Booking> {
+async function postUserBooking(userId: number, roomId: number): Promise<number> {
   checkRoom(userId, roomId);
   const data = { userId, roomId, updatedAt: dayjs().toDate() };
   const postedBooking = await bookingRepository.postOrUpdateUserBooking(data);
-  return postedBooking;
+  return postedBooking.id;
 }
 
 const bookingService = {

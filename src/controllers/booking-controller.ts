@@ -18,19 +18,18 @@ export async function getUserBookings(req: AuthenticatedRequest, res: Response) 
 export async function postBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   const { roomId } = req.body;
-
-  //se o quarto não existe, retornar 404
-  //se o quarto não tem mais vagas, retornar 403
-  //se o ticket for remoto, sem hospedagem ou não estiver pago, retornar 403
-  //
   try {
-    const booking = await bookingService.postUserBooking(userId, roomId);
+    const bookingId = await bookingService.postUserBooking(userId, roomId);
+    return res.status(httpStatus.CREATED).send(bookingId);
   } catch (error) {
     if (error.name === "OutOfBusinessRulesError") {
       return res.status(httpStatus.FORBIDDEN).send(error.message);
     }
     if (error.name === "NoVacancyError") {
       return res.status(httpStatus.FORBIDDEN).send(error.message);
+    }
+    if(error.name === "NotFoundError") {
+      return res.status(httpStatus.NOT_FOUND).send(error.message);
     }
   }
 }
