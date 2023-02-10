@@ -1,26 +1,28 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "@/middlewares";
 import bookingService from "@/services/booking-service";
+import httpStatus from "http-status";
 
 export async function getUserBookings(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
-
-  try{
+  try {
     const bookings = await bookingService.getUserBookings(userId);
-    return res.status(200).send(bookings);
-  }catch(error){
-
+    return res.status(httpStatus.OK).send(bookings);
+  } catch (error) {
+    if(error.name === "NotFoundError") {
+      return res.status(httpStatus.NOT_FOUND).send(error.message);
+    }
   }
 }
 
 export async function postOrUpdateBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   //precisa ter o ticket presencial, com hospedagem e pago
-  try{
+  try {
 
-   } catch(error){
-    if(error.name === "OutOfBusinessRulesError") {
-      return res.status(403).send( error.message );
+  } catch (error) {
+    if (error.name === "OutOfBusinessRulesError") {
+      return res.status(httpStatus.FORBIDDEN).send(error.message);
     }
   }
 }

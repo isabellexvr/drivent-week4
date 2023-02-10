@@ -17,8 +17,11 @@ async function checkTicket(userId: number) {
 }
 
 async function getUserBookings(userId: number) {
-  
-  
+  const bookings = await bookingRepository.getUserBooking(userId);
+  if(!bookings) {
+    throw notFoundError();
+  }
+  return bookings;
 }
 
 const bookingService = {
