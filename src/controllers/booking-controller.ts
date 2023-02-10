@@ -24,7 +24,7 @@ export async function postBooking(req: AuthenticatedRequest, res: Response) {
   //se o ticket for remoto, sem hospedagem ou não estiver pago, retornar 403
   //
   try {
-
+    const booking = await bookingService.postUserBooking(userId, roomId);
   } catch (error) {
     if (error.name === "OutOfBusinessRulesError") {
       return res.status(httpStatus.FORBIDDEN).send(error.message);

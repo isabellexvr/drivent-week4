@@ -1,8 +1,10 @@
 import enrollmentRepository from "@/repositories/enrollment-repository";
 import ticketRepository from "@/repositories/ticket-repository";
-import { notFoundError, outOtBusinessRulesError } from "@/errors";
+import hotelRepository from "@/repositories/hotel-repository";
+import { notFoundError, noVacancyError, outOtBusinessRulesError } from "@/errors";
 import bookingRepository from "@/repositories/booking-repository";
 import { Booking } from "@prisma/client";
+import dayjs from "dayjs";
 
 async function checkTicket(userId: number) {
   //buscar enrollment
@@ -19,20 +21,31 @@ async function checkTicket(userId: number) {
 }
 
 async function getUserBookings(userId: number): Promise<Booking> {
-  const bookings = await bookingRepository.getUserBooking(userId);
+  const bookings = await bookingRepository.getBookingsByUserId(userId);
   if(!bookings) {
     throw notFoundError();
   }
   return bookings;
 }
 
-async function postOrUpdateUserBooking(userId: number) {
+async function checkRoom(userId: number, roomId: number): Promise<void> {
+  const roomBookings = await bookingRepository.getBookingsByRoomId(roomId);
+  const room = await hotelRepository.findRoomByRoomId(roomId);
+  if( !room) throw notFoundError();
+  if(room.capacity <= roomBookings.length) throw noVacancyError();
+}
 
+async function postUserBooking(userId: number, roomId: number): Promise<Booking> {
+  checkRoom(userId, roomId);
+  const data = { userId, roomId, updatedAt: dayjs().toDate() };
+  const postedBooking = await bookingRepository.postOrUpdateUserBooking(data);
+  return postedBooking;
 }
 
 const bookingService = {
   checkTicket,
-  getUserBookings
+  getUserBookings,
+  postUserBooking
 };
 
 export default bookingService;
