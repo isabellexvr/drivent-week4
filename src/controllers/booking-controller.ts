@@ -12,8 +12,7 @@ export async function getUserBookings(req: AuthenticatedRequest, res: Response) 
     if(error.name === "NotFoundError") {
       return res.status(httpStatus.NOT_FOUND).send(error.message);
     }
-    console.log(error)
-    return res.sendStatus(500)
+    return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -22,7 +21,7 @@ export async function postBooking(req: AuthenticatedRequest, res: Response) {
   const { roomId } = req.body;
   try {
     const postedBookingId = await bookingService.postUserBooking(userId, roomId);
-    return res.status(httpStatus.CREATED).send(postedBookingId);
+    return res.status(httpStatus.CREATED).send({ postedBookingId });
   } catch (error) {
     if (error.name === "OutOfBusinessRulesError") {
       return res.status(httpStatus.FORBIDDEN).send(error.message);
@@ -33,6 +32,7 @@ export async function postBooking(req: AuthenticatedRequest, res: Response) {
     if(error.name === "NotFoundError") {
       return res.status(httpStatus.NOT_FOUND).send(error.message);
     }
+    return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -44,7 +44,7 @@ export async function updateBooking(req: AuthenticatedRequest, res: Response) {
   //o quarto para o qual o user quer mudar deve ter capacidade livre
   try {
     const updatedBookingId = await bookingService.updateUserBooking( userId, roomId, Number(bookingId));
-    return res.status(httpStatus.OK).send(updatedBookingId);
+    return res.status(httpStatus.OK).send({ updatedBookingId });
   }catch(error) {
     if (error.name === "OutOfBusinessRulesError") {
       return res.status(httpStatus.FORBIDDEN).send(error.message);
