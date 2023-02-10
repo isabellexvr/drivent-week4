@@ -12,6 +12,8 @@ export async function getUserBookings(req: AuthenticatedRequest, res: Response) 
     if(error.name === "NotFoundError") {
       return res.status(httpStatus.NOT_FOUND).send(error.message);
     }
+    console.log(error)
+    return res.sendStatus(500)
   }
 }
 
