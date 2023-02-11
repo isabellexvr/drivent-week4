@@ -33,7 +33,7 @@ describe("GET /booking", () => {
     const userWithoutSession = await createUser();
     const token = jwt.sign({ userId: userWithoutSession.id }, process.env.JWT_SECRET);
 
-    const response = await server.get("/bookings").set("Authorization", `Bearer ${token}`);
+    const response = await server.get("/booking").set("Authorization", `Bearer ${token}`);
 
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);
   });
@@ -43,7 +43,7 @@ describe("GET /booking", () => {
       const user = await createUser();
       const token = await generateValidToken(user);
 
-      const response = await server.get("/bookings").set("Authorization", `Bearer ${token}`);
+      const response = await server.get("/booking").set("Authorization", `Bearer ${token}`);
       expect(response.status).toBe(httpStatus.NOT_FOUND);
     });
     it("should respond with status 200 and with valid list of user's bookings", async () => {
@@ -53,18 +53,16 @@ describe("GET /booking", () => {
       const room = await createRoomWithHotelId(hotel.id);
       await createFakeBooking(user.id, room.id);
 
-      const response = await server.get("/bookings").set("Authorization", `Bearer ${token}`);
+      const response = await server.get("/booking").set("Authorization", `Bearer ${token}`);
       expect(response.status).toBe(httpStatus.OK);
       expect(response.body).toEqual(
-        expect.arrayContaining([
-          {
-            id: expect.any(Number),
-            userId: expect.any(Number),
-            roomId: expect.any(Number),
-            createdAt: expect.any(String),
-            updatedAt: expect.any(String)
-          }
-        ])
+        {
+          id: expect.any(Number),
+          userId: expect.any(Number),
+          roomId: expect.any(Number),
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String)
+        }
       );
     });
   });
