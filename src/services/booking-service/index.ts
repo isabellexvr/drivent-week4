@@ -12,6 +12,7 @@ async function checkTicket(userId: number) {
     throw notFoundError();
   }
   const ticket = await ticketRepository.findTicketByEnrollmentId(enrollment.id);
+  if(!ticket) throw notFoundError();
   if(!ticket.TicketType.includesHotel || ticket.TicketType.isRemote || ticket.status === "RESERVED") {
     throw outOtBusinessRulesError();
   }
@@ -33,6 +34,7 @@ async function checkRoom( roomId: number): Promise<void> {
 }
 
 async function postUserBooking(userId: number, roomId: number): Promise<number> {
+  await checkTicket(userId);
   await checkRoom(roomId);
   const data = { userId, roomId, updatedAt: dayjs().toDate() };
   const postedBooking = await bookingRepository.postOrUpdateUserBooking(data);
@@ -40,6 +42,7 @@ async function postUserBooking(userId: number, roomId: number): Promise<number> 
 }
 
 async function updateUserBooking(userId: number, roomId: number, bookingId: number) {
+  await checkTicket(userId);
   await getUserBookings(userId);
   await checkRoom(roomId);
   const data = { id: bookingId, userId, roomId, updatedAt: dayjs().toDate() };
