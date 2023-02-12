@@ -19,7 +19,6 @@ export async function getUserBookings(req: AuthenticatedRequest, res: Response) 
 export async function postBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   const { roomId } = req.body;
-  console.log("passou essa porra wtff")
   try {
     const postedBookingId = await bookingService.postUserBooking(userId, roomId);
     return res.status(httpStatus.CREATED).send({ postedBookingId });
@@ -41,8 +40,6 @@ export async function updateBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   const { roomId } = req.body;
   const { bookingId } = req.params;
-  //o user deve possuir uma reserva
-  //o quarto para o qual o user quer mudar deve ter capacidade livre
   try {
     const updatedBookingId = await bookingService.updateUserBooking( userId, roomId, Number(bookingId));
     return res.status(httpStatus.OK).send({ updatedBookingId });
