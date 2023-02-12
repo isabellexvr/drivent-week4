@@ -112,7 +112,7 @@ describe("POST /booking", () => {
       const body = { roomId: 1 };
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(404);
     });
     it("should respond with status 404 if user doesn't have a ticket", async () => {
       const user = await createUser();
@@ -122,7 +122,7 @@ describe("POST /booking", () => {
       const body = { roomId: 1 };
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(404);
     });
     it("should respond with status 403 if user's ticket type doesn't includes hotel", async () => {
       const user = await createUser();
@@ -133,7 +133,7 @@ describe("POST /booking", () => {
       const body = { roomId: 1 };
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(403);
     });
     it("should respond with status 403 if user's ticket type is remote", async () => {
       const user = await createUser();
@@ -144,7 +144,7 @@ describe("POST /booking", () => {
       const body = { roomId: 1 };
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(403);
     });
     it("should respond with status 403 if user's ticket status is reserved", async () => {
       const user = await createUser();
