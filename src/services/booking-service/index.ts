@@ -43,7 +43,8 @@ async function postUserBooking(userId: number, roomId: number): Promise<number> 
 
 async function updateUserBooking(userId: number, roomId: number, bookingId: number) {
   await checkTicket(userId);
-  await getUserBookings(userId);
+  const bookings = await getUserBookings(userId);
+  if( bookings.id !== bookingId) throw outOtBusinessRulesError();
   await checkRoom(roomId);
   const data = { id: bookingId, userId, roomId, updatedAt: dayjs().toDate() };
   const postedBooking = await bookingRepository.postOrUpdateUserBooking(data);

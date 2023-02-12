@@ -219,6 +219,29 @@ describe("PUT /booking/:bookingId", () => {
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);
   });
   describe("When token is valid", () => {
-    
+    it("should respond with status 400 if there was no body sent", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+
+      const response = await server.post("/booking/1").set("Authorization", `Bearer ${token}`);
+      expect(response.status).toBe(400);
+    });
+    it("should respond with status 400 if body sent has a invalid format", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const body = { name: 1 };
+
+      const response = await server.post("/booking/1").set("Authorization", `Bearer ${token}`).send(body);
+      expect(response.status).toBe(400);
+    });
+    it("should respond with status 400 if params sent has a invalid format", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const body = { name: 1 };
+
+      const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
+      expect(response.status).toBe(400);
+    });
+
   })
 })
