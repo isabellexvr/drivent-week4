@@ -19,6 +19,7 @@ export async function getUserBookings(req: AuthenticatedRequest, res: Response) 
 export async function postBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   const { roomId } = req.body;
+  console.log("passou essa porra wtff")
   try {
     const postedBookingId = await bookingService.postUserBooking(userId, roomId);
     return res.status(httpStatus.CREATED).send({ postedBookingId });

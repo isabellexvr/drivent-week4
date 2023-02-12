@@ -2,7 +2,7 @@ import supertest from "supertest";
 import httpStatus from "http-status";
 import faker from "@faker-js/faker";
 import * as jwt from "jsonwebtoken";
-import { createUser, createFakeBooking, createHotel, createRoomWithHotelId, createEnrollmentWithAddress, createTicketTypeWithHotel, createTicketTypeWithoutHotel, createTicket, createTicketTypeRemote } from "../factories";
+import { createUser, createFakeBooking, createHotel, createRoomWithHotelId, createEnrollmentWithAddress, createTicketTypeWithHotel, createTicketTypeWithoutHotel, createTicket, createTicketTypeRemote, createFewCapacityRoom, createBooking } from "../factories";
 import app, { init } from "@/app";
 import { cleanDb, generateValidToken } from "../helpers";
 
@@ -95,6 +95,7 @@ describe("POST /booking", () => {
       const token = await generateValidToken(user);
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`);
+      console.log(response.status)
       expect(response.status).toBe(400);
     });
     it("should respond with status 400 if body sent has a invalid format", async () => {
@@ -173,10 +174,26 @@ describe("POST /booking", () => {
       const enrollment = await createEnrollmentWithAddress(user);
       const ticketType = await createTicketTypeWithHotel();
       await createTicket(enrollment.id, ticketType.id, "PAID");
-      const body = { roomId: 0 };
+      const hotel = await createHotel();
+      const room = await createFewCapacityRoom(hotel.id);
+      await createBooking(user.id, room.id);
+      const body = { roomId: room.id };
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
       expect(response.status).toBe(403);
+    });
+    it("should respond with status 201 is post is correct", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeWithHotel();
+      await createTicket(enrollment.id, ticketType.id, "PAID");
+      const hotel = await createHotel();
+      const room = await createRoomWithHotelId(hotel.id);
+      const body = { roomId: room.id };
+
+      const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
+      expect(response.status).toBe(201);
     });
   });
 });
