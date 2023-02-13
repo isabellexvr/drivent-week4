@@ -12,7 +12,8 @@ async function checkTicket(userId: number) {
     throw notFoundError();
   }
   const ticket = await ticketRepository.findTicketByEnrollmentId(enrollment.id);
-  if(!ticket) throw notFoundError();
+  if(!ticket) {
+    throw notFoundError();}
   if(!ticket.TicketType.includesHotel || ticket.TicketType.isRemote || ticket.status === "RESERVED") {
     throw outOtBusinessRulesError();
   }
@@ -43,9 +44,12 @@ async function postUserBooking(userId: number, roomId: number): Promise<number> 
 
 async function updateUserBooking(userId: number, roomId: number, bookingId: number) {
   await checkTicket(userId);
-  const bookings = await getUserBookings(userId);
-  if( bookings.id !== bookingId) throw outOtBusinessRulesError();
   await checkRoom(roomId);
+  const bookings = await getUserBookings(userId);
+  if(!bookings) throw notFoundError();
+  if( bookings.id !== bookingId) throw outOtBusinessRulesError();
+  //é possível mudar pro mesmo quarto ?????? qual o sentido disso ?
+  //if( bookings.roomId === roomId) throw sameRoomError();
   const data = { id: bookingId, userId, roomId, updatedAt: dayjs().toDate() };
   const postedBooking = await bookingRepository.postOrUpdateUserBooking(data);
   return postedBooking.id;
